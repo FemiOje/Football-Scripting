@@ -4,18 +4,19 @@ using UnityEngine;
 
 public class PlayerControllerX : MonoBehaviour
 {
+    [SerializeField] ParticleSystem turboParticle;
     private Rigidbody playerRb;
     private float normalSpeed = 500f;
     private float turboSpeed = 1000f;
     private GameObject focalPoint;
-    [SerializeField] ParticleSystem turboParticle;
+
+    private float normalStrength = 10; // how hard to hit enemy without powerup
+    private float powerupStrength = 25; // how hard to hit enemy with powerup
 
     public bool hasPowerup;
     public GameObject powerupIndicator;
     public int powerUpDuration = 5;
 
-    private float normalStrength = 10; // how hard to hit enemy without powerup
-    private float powerupStrength = 25; // how hard to hit enemy with powerup
 
     void Start()
     {
@@ -25,28 +26,17 @@ public class PlayerControllerX : MonoBehaviour
 
     void Update()
     {
-        // Add force to player in direction of the focal point (and camera)
+        HandleParticles();
+    }
+
+    private void FixedUpdate()
+    {
         float verticalInput = Input.GetAxis("Vertical");
+
+        HandleMovement(verticalInput);
+
         SetPowerupIndicatorPosition();
         SetTurboParticlePosition();
-
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            turboParticle.Play();
-        }
-        if (Input.GetKeyUp(KeyCode.Space))
-        {
-            turboParticle.Stop();
-        }
-
-        if (Input.GetKey(KeyCode.Space))
-        {
-            AddTurboForce(verticalInput);
-        }
-        else
-        {
-            AddNormalForce(verticalInput);
-        }
     }
 
     // If Player collides with powerup, activate powerup
@@ -71,14 +61,16 @@ public class PlayerControllerX : MonoBehaviour
 
             if (hasPowerup) // if have powerup hit enemy with powerup force
             {
-                enemyRigidbody.AddForce(awayFromPlayer * powerupStrength, ForceMode.Impulse);
+                BlastEnemyWithPowerupForce(enemyRigidbody, awayFromPlayer);
             }
             else // if no powerup, hit enemy with normal strength 
             {
-                enemyRigidbody.AddForce(awayFromPlayer * normalStrength, ForceMode.Impulse);
+                BlastEnemyWithNormalForce(enemyRigidbody, awayFromPlayer);
             }
         }
     }
+
+
 
     void AddNormalForce(float verticalInput)
     {
@@ -99,6 +91,40 @@ public class PlayerControllerX : MonoBehaviour
     void SetTurboParticlePosition()
     {
         turboParticle.transform.position = transform.position + new Vector3(0, -0.6f, 0);
+    }
+
+    void HandleParticles()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            turboParticle.Play();
+        }
+        if (Input.GetKeyUp(KeyCode.Space))
+        {
+            turboParticle.Stop();
+        }
+    }
+
+    void HandleMovement(float verticalInput)
+    {
+        if (Input.GetKey(KeyCode.Space))
+        {
+            AddTurboForce(verticalInput);
+        }
+        else
+        {
+            AddNormalForce(verticalInput);
+        }
+    }
+
+    void BlastEnemyWithNormalForce(Rigidbody enemyRigidbody, Vector3 awayFromPlayer)
+    {
+        enemyRigidbody.AddForce(awayFromPlayer * normalStrength, ForceMode.Impulse);
+    }
+
+    void BlastEnemyWithPowerupForce(Rigidbody enemyRigidbody, Vector3 awayFromPlayer)
+    {
+        enemyRigidbody.AddForce(awayFromPlayer * powerupStrength, ForceMode.Impulse);
     }
 
     // Coroutine to count down powerup duration

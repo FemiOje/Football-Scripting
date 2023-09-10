@@ -16,26 +16,27 @@ public class EnemyX : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        // Set enemy direction towards player goal and move there
-        Vector3 lookDirection = (playerGoal.transform.position - transform.position).normalized;
-        enemyRb.AddForce(lookDirection * speed * Time.deltaTime);
-
+        MoveTowardPlayerGoal();
     }
 
     private void OnCollisionEnter(Collision other)
     {
+        string otherGameObject = other.gameObject.name;
+
         // If enemy collides with either goal, destroy it
-        if (other.gameObject.name == "Enemy Goal")
-        {
-            Destroy(gameObject);
-        } 
-        else if (other.gameObject.name == "Player Goal")
+        if (otherGameObject.Equals("Player Goal") || otherGameObject.Equals("Enemy Goal"))
         {
             Destroy(gameObject);
         }
+    }
 
+    private void MoveTowardPlayerGoal()
+    {
+        // Set enemy direction towards player goal and move there
+        Vector3 lookDirection = (playerGoal.transform.position - transform.position).normalized;
+        enemyRb.AddForce(lookDirection * speed * Time.deltaTime);
     }
 
 }
