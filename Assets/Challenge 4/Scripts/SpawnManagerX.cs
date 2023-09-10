@@ -6,17 +6,19 @@ public class SpawnManagerX : MonoBehaviour
 {
     public GameObject enemyPrefab;
     public GameObject powerupPrefab;
-
     private float spawnRangeX = 10;
     private float spawnZMin = 15; // set min spawn Z
     private float spawnZMax = 25; // set max spawn Z
 
     public int enemyCount;
-    int waveCount = 0;
-
-
+    int waveCount = 1;
     public GameObject player;
+    EnemyX enemyScript;
 
+    private void Start()
+    {
+        enemyScript = GameObject.Find("Enemy").GetComponent<EnemyX>();
+    }
     // Update is called once per frame
     void Update()
     {
@@ -24,10 +26,9 @@ public class SpawnManagerX : MonoBehaviour
 
         if (enemyCount == 0)
         {
-            waveCount++;
-            SpawnEnemyWave(waveCount);
+            SpawnNewEnemyWave(++waveCount);
+            IncreaseEnemySpeed();
         }
-
     }
 
     // Generate random spawn position for powerups and enemy balls
@@ -39,7 +40,7 @@ public class SpawnManagerX : MonoBehaviour
     }
 
 
-    void SpawnEnemyWave(int enemiesToSpawn)
+    void SpawnNewEnemyWave(int enemiesToSpawn)
     {
         Vector3 powerupSpawnOffset = new Vector3(0, 0, -15); // make powerups spawn at player end
 
@@ -65,7 +66,11 @@ public class SpawnManagerX : MonoBehaviour
         player.transform.position = new Vector3(0, 1, -7);
         player.GetComponent<Rigidbody>().velocity = Vector3.zero;
         player.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+    }
 
+    void IncreaseEnemySpeed()
+    {
+        enemyScript.speed += 10.0f;
     }
 
 }
