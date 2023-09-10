@@ -12,10 +12,10 @@ public class SpawnManagerX : MonoBehaviour
     private float spawnZMax = 25; // set max spawn Z
 
     public int enemyCount;
-    public int waveCount = 1;
+    int waveCount = 0;
 
 
-    public GameObject player; 
+    public GameObject player;
 
     // Update is called once per frame
     void Update()
@@ -24,13 +24,14 @@ public class SpawnManagerX : MonoBehaviour
 
         if (enemyCount == 0)
         {
+            waveCount++;
             SpawnEnemyWave(waveCount);
         }
 
     }
 
     // Generate random spawn position for powerups and enemy balls
-    Vector3 GenerateSpawnPosition ()
+    Vector3 GenerateSpawnPosition()
     {
         float xPos = Random.Range(-spawnRangeX, spawnRangeX);
         float zPos = Random.Range(spawnZMin, spawnZMax);
@@ -49,18 +50,17 @@ public class SpawnManagerX : MonoBehaviour
         }
 
         // Spawn number of enemy balls based on wave number
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < enemiesToSpawn; i++)
         {
             Instantiate(enemyPrefab, GenerateSpawnPosition(), enemyPrefab.transform.rotation);
         }
 
-        waveCount++;
         ResetPlayerPosition(); // put player back at start
 
     }
 
     // Move player back to position in front of own goal
-    void ResetPlayerPosition ()
+    void ResetPlayerPosition()
     {
         player.transform.position = new Vector3(0, 1, -7);
         player.GetComponent<Rigidbody>().velocity = Vector3.zero;
